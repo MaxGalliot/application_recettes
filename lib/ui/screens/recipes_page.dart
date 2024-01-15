@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../models/recipe_model.dart';
 import 'recipe_detail_page.dart';
 import '../../services/api_service.dart';
 
@@ -7,7 +8,7 @@ class RecipesPage extends StatefulWidget {
   _RecipesPageState createState() => _RecipesPageState();
 }
 
-enum RecipeType { breakfast, lunch, dinner, snack }
+enum RecipeType { breakfast, lunch, dinner, snack, vegetarian, vegan }
 
 class _RecipesPageState extends State<RecipesPage> {
   late Future<List<Recipe>> futureRecipes;
@@ -29,13 +30,20 @@ class _RecipesPageState extends State<RecipesPage> {
         return recipes.where((r) => r.dishTypes.contains('dinner')).toList();
       case RecipeType.snack:
         return recipes.where((r) => r.dishTypes.contains('snack')).toList();
+      case RecipeType.vegetarian:
+        return recipes.where((r) => r.vegetarian).toList();
+      case RecipeType.vegan:
+        return recipes.where((r) => r.vegan).toList();
+      default:
+        return recipes;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Recettes')),
+      backgroundColor: Color(0xFF3F4E4F),
+      appBar: AppBar(title: Text('Recipes'), backgroundColor: Color(0xFF2C3639)),
       body: Column(
         children: [
           Container(
@@ -46,17 +54,24 @@ class _RecipesPageState extends State<RecipesPage> {
                 return Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: FilterChip(
-                    label: Text(type.toString().split('.').last),
+                    backgroundColor: selectedType == type ? Colors.green : Colors.grey,
+                    label: Text(
+                      type.toString().split('.').last,
+                      style: TextStyle(
+                        color: selectedType == type ? Colors.white : Colors.black,
+                      ),
+                    ),
                     selected: selectedType == type,
-                    onSelected: (bool selected)
-                    {
+                    onSelected: (bool selected) {
                       setState(() {
                         if (selected) {
-                          selectedType = type;
+                          selectedType =
+                              type;
                         } else {
-                          selectedType = null; // Deselect the chip if it was selected again
+                          selectedType = null;
+                          selectedType = null;
                         }
-                        futureRecipes = fetchRecipes(); // Refetch recipes or apply a filter
+                        futureRecipes = fetchRecipes();
                       });
                     },
                   ),
@@ -87,7 +102,7 @@ class _RecipesPageState extends State<RecipesPage> {
                     },
                   );
                 } else {
-                  return Center(child: Text('Aucune recette trouvée'));
+                  return Center(child: Text('No recipe found.'));
                 }
               },
             ),
@@ -106,6 +121,7 @@ class RecipeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: Color(0xFF2C3639),
       clipBehavior: Clip.antiAliasWithSaveLayer,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
@@ -116,7 +132,7 @@ class RecipeCard extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => RecipeDetailPage(recipe.name, recipe.description),
+              builder: (context) => RecipeDetailPage(recipe.name, recipe.description, recipe.imageUrl, recipe.nutrition),
             ),
           );
         },
@@ -136,10 +152,10 @@ class RecipeCard extends StatelessWidget {
                 recipe.name,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
+                  color: Color(0xFFDCD7C9),
                 ),
               ),
             ),
-            // The description is not included here, so it won't be displayed
           ],
         ),
       ),
