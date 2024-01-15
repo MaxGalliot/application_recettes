@@ -1,6 +1,8 @@
 import 'package:application_recettes/services/api_service.dart';
 import 'package:application_recettes/ui/screens/recipe_detail_page.dart';
 import 'package:flutter/material.dart';
+import '../../models/nutrition_model.dart';
+import '../../models/recipe_model.dart';
 import 'recipes_page.dart';
 
 class MyApp extends StatelessWidget {
@@ -17,8 +19,10 @@ class MainPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFF3F4E4F),
       appBar: AppBar(
-        title: Text('Recettes de cuisine'),
+        title: Text('Cooking recipes'),
+        backgroundColor: Color(0xFF2C3639),
         actions: [
           IconButton(
             icon: Icon(Icons.search),
@@ -32,9 +36,13 @@ class MainPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset('foodassistantlogo.png', height: 150, width: 150),
             SizedBox(height: 20),
-            Text('Recettes de cuisine', style: TextStyle(fontSize: 20)),
+            Text('Cooking recipes',
+                style: TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFFDCD7C9),
+                )),
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
@@ -43,7 +51,17 @@ class MainPage extends StatelessWidget {
                   MaterialPageRoute(builder: (context) => RecipesPage()),
                 );
               },
-              child: Text('Voir les recettes'),
+              child: Text('Show all recipes'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFFA27B5C),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                textStyle: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold)
+              )
             ),
           ],
         ),
@@ -53,7 +71,6 @@ class MainPage extends StatelessWidget {
 }
 
 class RecipeSearchDelegate extends SearchDelegate<Recipe> {
-
   @override
   List<Widget> buildActions(BuildContext context) {
     return [
@@ -71,7 +88,17 @@ class RecipeSearchDelegate extends SearchDelegate<Recipe> {
     return IconButton(
       icon: Icon(Icons.arrow_back),
       onPressed: () {
-        close(context, Recipe(name: '', description: '', imageUrl: '', dishTypes: []));
+        close(
+            context,
+            Recipe(
+                name: '',
+                description: '',
+                imageUrl: '',
+                dishTypes: [],
+                vegetarian: false,
+                vegan: false,
+                nutrition: Nutrition(
+                    calories: '0', fat: '0', carbs: '0', protein: '0')));
       },
     );
   }
@@ -118,13 +145,13 @@ class RecipeSearchDelegate extends SearchDelegate<Recipe> {
 
   Widget buildSearchResults(List<Recipe> resultats) {
     List<Recipe> sortResult = resultats
-        .where((recette) =>
-            recette.name.toLowerCase().contains(query.toLowerCase()) ||
-            recette.description.toLowerCase().contains(query.toLowerCase()))
+        .where((recipe) =>
+            recipe.name.toLowerCase().contains(query.toLowerCase()) ||
+            recipe.description.toLowerCase().contains(query.toLowerCase()))
         .toList();
 
     if (sortResult.isEmpty) {
-      return Center(child: Text('Aucune recette trouvée.'));
+      return Center(child: Text('No recipe was found.'));
     }
 
     return ListView.builder(
@@ -136,7 +163,11 @@ class RecipeSearchDelegate extends SearchDelegate<Recipe> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => RecipeDetailPage(sortResult[index].name, sortResult[index].description),
+                builder: (context) => RecipeDetailPage(
+                    sortResult[index].name,
+                    sortResult[index].description,
+                    sortResult[index].imageUrl,
+                    sortResult[index].nutrition),
               ),
             );
           },
@@ -147,13 +178,13 @@ class RecipeSearchDelegate extends SearchDelegate<Recipe> {
 
   Widget buildSearchSuggestions(List<Recipe> suggestions) {
     List<Recipe> filteredSuggestions = suggestions
-        .where((recette) =>
-    recette.name.toLowerCase().contains(query.toLowerCase()) ||
-        recette.description.toLowerCase().contains(query.toLowerCase()))
+        .where((recipe) =>
+            recipe.name.toLowerCase().contains(query.toLowerCase()) ||
+            recipe.description.toLowerCase().contains(query.toLowerCase()))
         .toList();
 
     if (filteredSuggestions.isEmpty) {
-      return Center(child: Text('Aucune suggestion trouvée.'));
+      return Center(child: Text('No suggestions found.'));
     }
 
     return ListView.builder(
@@ -165,7 +196,11 @@ class RecipeSearchDelegate extends SearchDelegate<Recipe> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => RecipeDetailPage(filteredSuggestions[index].name, filteredSuggestions[index].description),
+                builder: (context) => RecipeDetailPage(
+                    filteredSuggestions[index].name,
+                    filteredSuggestions[index].description,
+                    filteredSuggestions[index].imageUrl,
+                    filteredSuggestions[index].nutrition),
               ),
             );
           },
