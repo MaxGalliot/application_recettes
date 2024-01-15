@@ -34,7 +34,7 @@ class MainPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset('assets/recipe_image.jpg', height: 150, width: 150),
+            Image.asset('foodassistantlogo.png', height: 150, width: 150),
             SizedBox(height: 20),
             Text('Recettes de cuisine', style: TextStyle(fontSize: 20)),
             SizedBox(height: 20),
